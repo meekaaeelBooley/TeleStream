@@ -226,7 +226,31 @@ lag-based alerting — are the same ones that matter at millions of events/sec; 
 difference is horizontal sizing (broker count, partition count, executor count), not
 architecture. The README should state this framing explicitly rather than overclaiming.
 
-## 9. Extension Seams (Stretch Goals)
+## 9. Repository Layout
+
+```
+TeleStream/
+├── README.md                  # Public-facing overview
+├── docker-compose.yml         # Full stack: kafka, spark, postgres, grafana, prometheus, producer
+├── docker/                    # Custom Dockerfiles (producer, spark job image)
+├── producer/                  # Event generators (one module per event domain)
+│   └── telestream_producer/   # Python package
+├── spark/                     # Spark Structured Streaming jobs
+├── warehouse/                 # schema.sql, migrations, seed data for dimensions
+├── dashboards/                # Grafana dashboard JSON + provisioning config
+├── monitoring/                # Prometheus config, alert rules
+├── quality/                   # Great Expectations suites, Pandera schemas
+├── tests/
+│   ├── unit/
+│   └── integration/           # Runs against docker-compose services
+├── docs/                      # Architecture, planning, schemas, ADRs (MkDocs source)
+└── .github/workflows/         # CI pipelines
+```
+
+Generated artifacts (Parquet output, Spark checkpoints, GE data docs) live in
+`.gitignore`d data directories and never enter version control.
+
+## 10. Extension Seams (Stretch Goals)
 
 Designed-in seams for future work, in rough order of payoff:
 

@@ -11,7 +11,7 @@ Rule of thumb: don't start a phase until the previous phase's acceptance criteri
 
 Scope:
 
-- Repository scaffolding per the layout in [CLAUDE.md](../CLAUDE.md).
+- Repository scaffolding per the layout in [architecture.md](architecture.md).
 - `pyproject.toml` with pinned dev tooling (ruff, mypy, pytest).
 - GitHub Actions workflow: lint + format check + unit tests (even if only a placeholder test).
 - `.gitignore` covering venvs, checkpoints, Parquet output, GE artifacts.
