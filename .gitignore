@@ -1,0 +1,24 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Runtime data (never commit pipeline output)
+data/
+lake/
+checkpoints/
+uncommitted/
+great_expectations/uncommitted/
+
+# Docs build
+site/
+
+# IDE / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
