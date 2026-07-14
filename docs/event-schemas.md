@@ -184,4 +184,4 @@ panel.
 - Additive optional fields: allowed without a version bump.
 - Renames, removals, type changes: bump `schema_version`; the Spark job must accept the
   previous version for at least one release.
-- Stretch goal: move enforcement to Schema Registry + Avro (see architecture §9).
+- Stretch goal: move enforcement to Schema Registry + Avro (see architecture §10).
