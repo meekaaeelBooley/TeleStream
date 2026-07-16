@@ -1,0 +1,44 @@
+site_name: TeleStream
+site_description: Enterprise-inspired telecom streaming data platform
+repo_url: https://github.com/meekaaeelBooley/TeleStream
+repo_name: meekaaeelBooley/TeleStream
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+  features:
+    - navigation.sections
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - tables
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Overview: index.md
+  - Architecture: architecture.md
+  - Delivery Plan: planning.md
+  - Event Schemas: event-schemas.md
+  - Data Model: data-model.md
+  - ADRs:
+      - Kafka as event backbone: adr/0001-kafka-as-event-backbone.md
+      - Spark Structured Streaming: adr/0002-spark-structured-streaming.md
+      - Dual storage: adr/0003-dual-storage-postgres-parquet.md
+      - Docker Compose: adr/0004-docker-compose-single-machine.md
