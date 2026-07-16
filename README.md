@@ -7,10 +7,11 @@
 > **Parquet** data lake, and visualized through **Grafana** with **Prometheus**
 > observability. The whole stack runs with one `docker compose up`.
 
-**Status: design & planning complete — implementation in progress.** This repo currently
-contains the full architecture, event contracts, data model, and phased delivery plan.
-Code lands phase by phase per the [delivery plan](docs/planning.md); this README only
-ever describes what actually exists.
+**Status: core platform working end-to-end.** Event generation → Kafka → Spark
+validation/rules/dedup → Postgres star schema + Parquet lake → five provisioned Grafana
+dashboards, with Prometheus scraping Kafka lag and warehouse health. Verified by 55 unit
+tests and 12 integration tests against the live stack. Remaining roadmap (Great
+Expectations suites, hardening, polish): [delivery plan](docs/planning.md).
 
 ## Why This Project
 
@@ -78,14 +79,34 @@ Deep dive: [docs/architecture.md](docs/architecture.md)
 
 ## Quick Start
 
-> Available once Phase 1 lands — see the [delivery plan](docs/planning.md). Target:
->
-> ```bash
-> git clone https://github.com/meekaaeelBooley/TeleStream.git
-> cd TeleStream
-> docker compose up -d
-> # Grafana at http://localhost:3000 with live dashboards within ~2 minutes
-> ```
+Requires Docker Desktop (or any Docker Engine with Compose v2) and ~4 GB free RAM.
+
+```bash
+git clone https://github.com/meekaaeelBooley/TeleStream.git
+cd TeleStream
+docker compose up -d --build
+```
+
+Within ~2 minutes:
+
+- **Grafana** — http://localhost:3000 (admin / admin) → five live dashboards under the
+  *TeleStream* folder
+- **Prometheus** — http://localhost:9090 (Kafka lag, warehouse, pipeline targets)
+- **Warehouse** — `postgresql://telestream:telestream@localhost:5432/telestream`
+- **Kafka** — `localhost:29092` from the host
+
+Tune the simulation with env vars: `EVENTS_PER_SECOND` (default 50), `ERROR_RATE`
+(default 0.02 — fraction of deliberately corrupted events exercising the DLQ).
+
+### Running the tests
+
+```bash
+python -m venv .venv && . .venv/Scripts/activate   # Windows; use bin/activate on Linux
+pip install -e ".[dev]"
+pytest tests/unit                    # fast, no services needed
+pytest tests/integration             # requires the compose stack to be up
+ruff check . && mypy                 # lint + strict typing
+```
 
 ## Roadmap
 
