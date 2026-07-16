@@ -1,0 +1,26 @@
+groups:
+  - name: telestream-pipeline
+    rules:
+      - alert: KafkaConsumerLagGrowing
+        expr: sum(kafka_consumergroup_lag) > 50000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Consumer lag above 50k messages for 5 minutes"
+
+      - alert: PipelineStalled
+        expr: sum(rate(kafka_topic_partition_current_offset{topic!~"__.*"}[5m])) == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "No messages produced to any topic for 5 minutes"
+
+      - alert: PostgresDown
+        expr: pg_up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Warehouse is unreachable"
