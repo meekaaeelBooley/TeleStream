@@ -1,0 +1,13 @@
+.venv/
+.git/
+.github/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+site/
+docs/
+tests/
+data/
+lake/
+checkpoints/
+**/__pycache__/

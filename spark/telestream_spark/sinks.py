@@ -56,6 +56,14 @@ def upsert_subscribers(conn: "psycopg2.extensions.connection", events: list[Even
 def update_tower_status(conn: "psycopg2.extensions.connection", events: list[Event]) -> None:
     if not events:
         return
+    # One row per tower: a multi-row upsert hitting the same key twice is a
+    # CardinalityViolation in Postgres, so keep only each tower's latest event.
+    latest: dict[str, Event] = {}
+    for event in events:
+        current = latest.get(str(event["tower_id"]))
+        if current is None or _ts(event) > _ts(current):
+            latest[str(event["tower_id"])] = event
+    events = list(latest.values())
     rows = [
         (
             e["tower_id"],
