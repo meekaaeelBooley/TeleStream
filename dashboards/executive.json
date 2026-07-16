@@ -1,0 +1,316 @@
+{
+  "editable": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT count(*) FROM dim_subscriber WHERE is_active",
+          "refId": "A"
+        }
+      ],
+      "title": "Active Subscribers",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "currencyZAR"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(sum(total_amount), 0) FROM agg_revenue_minute\n                WHERE minute > now() - interval '1 hour'",
+          "refId": "A"
+        }
+      ],
+      "title": "Revenue (last hour)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(sum(call_count), 0) FROM agg_calls_minute\n                WHERE minute > now() - interval '1 hour'",
+          "refId": "A"
+        }
+      ],
+      "title": "Calls (last hour)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 4,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(sum(record_count), 0) FROM agg_dlq_minute\n                WHERE minute > now() - interval '1 hour'",
+          "refId": "A"
+        }
+      ],
+      "title": "Rejected Events (last hour)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "currencyZAR"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "id": 5,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT minute AS time, revenue_type AS metric, sum(total_amount) AS value\n                FROM agg_revenue_minute\n                WHERE $__timeFilter(minute)\n                GROUP BY 1, 2 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Revenue per Minute",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "id": 6,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT minute AS time, sum(call_count) AS calls, sum(dropped_count) AS dropped\n                FROM agg_calls_minute\n                WHERE $__timeFilter(minute)\n                GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Calls per Minute",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "id": 7,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT date_trunc('minute', created_at) AS time, count(*) AS subscribers\n                FROM dim_subscriber\n                WHERE $__timeFilter(created_at)\n                GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "New Subscribers per Minute",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "decmbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 8,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT minute AS time, sum(total_mb) AS mb\n                FROM agg_data_minute\n                WHERE $__timeFilter(minute)\n                GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Data Usage per Minute (MB)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": [
+    "telestream"
+  ],
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timezone": "utc",
+  "title": "Executive Overview",
+  "uid": "telestream-executive"
+}

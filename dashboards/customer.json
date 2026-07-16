@@ -1,0 +1,166 @@
+{
+  "editable": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT province, count(*) FROM dim_subscriber GROUP BY 1 ORDER BY 2 DESC",
+          "refId": "A"
+        }
+      ],
+      "title": "Subscribers by Province",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT plan, count(*) FROM dim_subscriber GROUP BY 1",
+          "refId": "A"
+        }
+      ],
+      "title": "Subscribers by Plan",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "Revenue in window divided by subscriber base",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "currencyZAR"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 9
+      },
+      "id": 3,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT coalesce(sum(r.total_amount), 0)\n                       / greatest(count(DISTINCT s.subscriber_key), 1)\n                FROM dim_subscriber s\n                LEFT JOIN agg_revenue_minute r ON r.minute > now() - interval '24 hours'",
+          "refId": "A"
+        }
+      ],
+      "title": "ARPU (last 24h)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "telestream-pg"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 16,
+        "x": 8,
+        "y": 9
+      },
+      "id": 4,
+      "options": {},
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "telestream-pg"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT s.msisdn AS \"MSISDN\", s.province AS \"Province\",\n                       round(sum(f.mb_used), 1) AS \"MB Used\"\n                FROM fact_data_usage f\n                JOIN dim_subscriber s ON s.subscriber_key = f.subscriber_key\n                WHERE f.event_timestamp > now() - interval '1 hour'\n                GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 10",
+          "refId": "A"
+        }
+      ],
+      "title": "Top Data Users (last hour)",
+      "type": "table"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": [
+    "telestream"
+  ],
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timezone": "utc",
+  "title": "Customer Insights",
+  "uid": "telestream-customer"
+}
