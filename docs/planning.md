@@ -117,9 +117,9 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] GE suite passes against a freshly populated warehouse and fails when seeded with a
+- [x] GE suite passes against a freshly populated warehouse and fails when seeded with a
       known-bad row (verified by a test).
-- [ ] Full CI pipeline green, including the compose-based integration job.
+- [x] Full CI pipeline green, including the compose-based integration job.
 
 ## Phase 7 — Polish & Publication
 
@@ -132,8 +132,8 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] A stranger can go from clone to live dashboards using only the README.
-- [ ] README claims match reality exactly.
+- [x] A stranger can go from clone to live dashboards using only the README.
+- [x] README claims match reality exactly.
 
 ---
 
