@@ -88,7 +88,7 @@ Acceptance criteria:
 - [x] Fresh `docker compose up -d` → Grafana shows live-updating panels within ~2 minutes,
       no manual setup.
 - [x] Every KPI panel is backed by a documented query against the star schema/rollups.
-- [ ] Screenshots captured for the README.
+- [x] Screenshots captured for the README.
 
 ## Phase 5 — Observability
 

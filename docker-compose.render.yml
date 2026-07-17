@@ -1,0 +1,15 @@
+# Overlay enabling server-side dashboard rendering (for README screenshots).
+# Usage: docker compose -f docker-compose.yml -f docker-compose.render.yml up -d
+# then:  bash scripts/capture_dashboards.sh
+services:
+  renderer:
+    image: grafana/grafana-image-renderer:3.12.0
+    container_name: telestream-renderer
+
+  grafana:
+    environment:
+      GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+    depends_on:
+      renderer:
+        condition: service_started

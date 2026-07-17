@@ -126,6 +126,21 @@ Five Grafana dashboards are provisioned automatically (JSON generated from
 | Customer Insights | CVM | Subscribers by province/plan, ARPU, top data users |
 | Pipeline Operations | Data platform | DLQ breakdown by reason, latest dead letters, Kafka consumer lag |
 
+**Executive Overview** — live subscriber, revenue, call, and rejection KPIs:
+
+![Executive dashboard](docs/img/dashboard-executive.png)
+
+**Network Operations** — tower health, load, dropped calls, traffic by technology:
+
+![Network dashboard](docs/img/dashboard-network.png)
+
+More: [Sales & Revenue](docs/img/dashboard-sales.png) ·
+[Customer Insights](docs/img/dashboard-customer.png) ·
+[Pipeline Operations](docs/img/dashboard-pipeline.png)
+
+(Screenshots are reproducible: `docker compose -f docker-compose.yml -f docker-compose.render.yml up -d`
+then `bash scripts/capture_dashboards.sh`.)
+
 ## Data Quality — Two Layers
 
 - **In-stream (per event):** pandera contracts + a pure-Python business rules engine inside
