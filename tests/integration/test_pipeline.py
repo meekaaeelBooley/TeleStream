@@ -87,12 +87,18 @@ def test_fact_tables_receive_rows(conn, table: str) -> None:
 
 
 def test_dlq_captures_rejections(conn) -> None:
-    assert wait_for(lambda: count(conn, "dlq_records") > 0), "dlq_records stayed empty"
-    with conn.cursor() as cur:
-        cur.execute("SELECT DISTINCT rejection_reason FROM dlq_records")
-        reasons = {row[0] for row in cur.fetchall()}
-    assert any(r.startswith("RULE_VIOLATION") or r.startswith("SCHEMA_VIOLATION") for r in reasons)
-    assert "PAYMENT_DECLINED" in reasons
+    def reasons() -> set[str]:
+        with conn.cursor() as cur:
+            cur.execute("SELECT DISTINCT rejection_reason FROM dlq_records")
+            return {row[0] for row in cur.fetchall()}
+
+    # Producer-side payment failures reach the warehouse one hop earlier than
+    # Spark-detected violations (events query -> DLQ topic -> DLQ query), so
+    # each category gets its own wait rather than one snapshot.
+    assert wait_for(lambda: "PAYMENT_DECLINED" in reasons()), "no payment failures in DLQ"
+    assert wait_for(
+        lambda: any(r.startswith(("RULE_VIOLATION", "SCHEMA_VIOLATION")) for r in reasons())
+    ), "no rule/schema violations in DLQ"
 
 
 def test_rollups_populate(conn) -> None:
