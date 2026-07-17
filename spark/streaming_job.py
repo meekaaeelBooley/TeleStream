@@ -198,7 +198,7 @@ class BatchProcessor:
                 timestamps.extend(_event_ts(event) for event in events)
                 counts[event_type] = len(events)
             if timestamps:
-                sinks.refresh_rollups(conn, min(timestamps), max(timestamps))
+                sinks.refresh_fact_rollups(conn, min(timestamps), max(timestamps))
             conn.commit()
         except Exception:
             conn.rollback()
@@ -231,7 +231,7 @@ def process_dlq_batch(batch: DataFrame, batch_id: int) -> None:
     try:
         sinks.insert_dlq(conn, _dedupe(records))
         stamps = [_event_ts(r) for r in records]
-        sinks.refresh_rollups(conn, min(stamps), max(stamps))
+        sinks.refresh_dlq_rollups(conn, min(stamps), max(stamps))
         conn.commit()
     except Exception:
         conn.rollback()

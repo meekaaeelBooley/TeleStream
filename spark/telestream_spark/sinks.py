@@ -240,7 +240,11 @@ def insert_dlq(conn: "psycopg2.extensions.connection", events: list[Event]) -> N
         )
 
 
-_ROLLUP_REFRESH = """
+# Rollup ownership: the events query refreshes the fact rollups, the DLQ query
+# refreshes only agg_dlq_minute. The two run concurrently — sharing a rollup
+# table between them races the delete+insert and dies on the primary key.
+
+_FACT_ROLLUP_REFRESH = """
 DELETE FROM agg_revenue_minute WHERE minute BETWEEN %(lo)s AND %(hi)s;
 INSERT INTO agg_revenue_minute (minute, province, revenue_type, total_amount, txn_count)
 SELECT date_trunc('minute', r.event_timestamp), s.province, r.revenue_type,
@@ -270,7 +274,9 @@ SELECT date_trunc('minute', event_timestamp), tower_key, technology, sum(mb_used
 FROM fact_data_usage
 WHERE event_timestamp >= %(lo)s AND event_timestamp < %(hi_next)s
 GROUP BY 1, 2, 3;
+"""
 
+_DLQ_ROLLUP_REFRESH = """
 DELETE FROM agg_dlq_minute WHERE minute BETWEEN %(lo)s AND %(hi)s;
 INSERT INTO agg_dlq_minute (minute, source_topic, rejection_reason, record_count)
 SELECT date_trunc('minute', rejected_at), source_topic, rejection_reason, count(*)
@@ -280,11 +286,22 @@ GROUP BY 1, 2, 3;
 """
 
 
-def refresh_rollups(conn: "psycopg2.extensions.connection", lo: datetime, hi: datetime) -> None:
-    """Recompute every rollup for the affected minute range from facts —
-    delete + insert, so replays are idempotent."""
+def _minute_params(lo: datetime, hi: datetime) -> dict[str, datetime]:
     lo_min = lo.replace(second=0, microsecond=0)
     hi_min = hi.replace(second=0, microsecond=0)
-    hi_next = hi_min + timedelta(minutes=1)
+    return {"lo": lo_min, "hi": hi_min, "hi_next": hi_min + timedelta(minutes=1)}
+
+
+def refresh_fact_rollups(
+    conn: "psycopg2.extensions.connection", lo: datetime, hi: datetime
+) -> None:
+    """Recompute revenue/calls/data rollups for the affected minute range from
+    facts — delete + insert, so replays are idempotent. Events query only."""
     with conn.cursor() as cur:
-        cur.execute(_ROLLUP_REFRESH, {"lo": lo_min, "hi": hi_min, "hi_next": hi_next})
+        cur.execute(_FACT_ROLLUP_REFRESH, _minute_params(lo, hi))
+
+
+def refresh_dlq_rollups(conn: "psycopg2.extensions.connection", lo: datetime, hi: datetime) -> None:
+    """Recompute the DLQ rollup for the affected minute range. DLQ query only."""
+    with conn.cursor() as cur:
+        cur.execute(_DLQ_ROLLUP_REFRESH, _minute_params(lo, hi))
