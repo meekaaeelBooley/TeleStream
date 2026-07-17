@@ -15,7 +15,9 @@ from generate_dashboards import ALL  # noqa: E402
 def test_committed_dashboards_match_definitions() -> None:
     for dash in ALL:
         name = dash["uid"].removeprefix("telestream-")
-        committed = json.loads((REPO_ROOT / "dashboards" / f"{name}.json").read_text())
+        committed = json.loads(
+            (REPO_ROOT / "dashboards" / f"{name}.json").read_text(encoding="utf-8")
+        )
         assert committed == dash, (
             f"{name}.json is stale — run: python dashboards/generate_dashboards.py"
         )

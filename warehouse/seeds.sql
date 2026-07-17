@@ -1,4 +1,4 @@
--- GENERATED FILE — do not edit by hand.
+-- GENERATED FILE â€” do not edit by hand.
 -- Regenerate with: python warehouse/generate_seeds.py
 
 INSERT INTO dim_tower (tower_id, tower_name, province, technologies) VALUES

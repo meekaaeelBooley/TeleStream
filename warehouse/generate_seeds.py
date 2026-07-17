@@ -35,7 +35,7 @@ def render_seeds() -> str:
 
 def main() -> None:
     out = Path(__file__).parent / "seeds.sql"
-    out.write_text(render_seeds(), newline="\n")
+    out.write_text(render_seeds(), newline="\n", encoding="utf-8")
     print(f"wrote {out}")
 
 

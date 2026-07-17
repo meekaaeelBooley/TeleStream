@@ -12,7 +12,7 @@ from generate_seeds import render_seeds  # noqa: E402
 
 
 def test_committed_seeds_match_catalog() -> None:
-    committed = (REPO_ROOT / "warehouse" / "seeds.sql").read_text()
+    committed = (REPO_ROOT / "warehouse" / "seeds.sql").read_text(encoding="utf-8")
     assert committed == render_seeds(), (
         "seeds.sql is stale — run: python warehouse/generate_seeds.py"
     )
