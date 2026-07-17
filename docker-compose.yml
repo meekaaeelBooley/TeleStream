@@ -17,14 +17,21 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_LOG_RETENTION_HOURS: 24
       KAFKA_HEAP_OPTS: -Xms256m -Xmx512m
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
     ports:
       - "29092:29092"
+    volumes:
+      # Broker data must survive container recreation, not just restarts —
+      # without this a recreated broker comes back with zero topics.
+      - kafkadata:/var/lib/kafka/data
     healthcheck:
+      # The check spawns a JVM; give it generous time so load spikes don't
+      # flap the broker to unhealthy while it is actually serving fine.
       test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list > /dev/null 2>&1"]
-      interval: 10s
-      timeout: 10s
+      interval: 15s
+      timeout: 30s
       retries: 12
-      start_period: 20s
+      start_period: 30s
     deploy:
       resources:
         limits:
@@ -173,5 +180,6 @@ services:
 
 volumes:
   pgdata:
+  kafkadata:
   lake:
   checkpoints:
