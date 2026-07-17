@@ -26,6 +26,7 @@ dev = [
     "psycopg2-binary>=2.9",
     "pandas-stubs>=2.2",
     "types-psycopg2>=2.9",
+    "great_expectations>=1.3",
 ]
 
 [tool.setuptools.packages.find]
@@ -53,11 +54,17 @@ select = [
 [tool.mypy]
 python_version = "3.12"
 strict = true
-files = ["producer", "spark", "warehouse", "dashboards"]
+files = ["producer", "spark", "warehouse", "dashboards", "quality"]
 
 [[tool.mypy.overrides]]
-module = ["kafka.*", "pandera.*", "pyspark.*"]
+module = ["kafka.*", "pandera.*", "pyspark.*", "great_expectations.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# GE 1.x re-exports its expectation classes without __all__; strict mode's
+# no-implicit-reexport flags every gxe.Expect* reference.
+module = ["quality.suites"]
+disable_error_code = ["attr-defined"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
