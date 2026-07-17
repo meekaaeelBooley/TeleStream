@@ -1,0 +1,1582 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Enterprise-inspired telecom streaming data platform">
+      
+      
+      
+      
+        <link rel="prev" href="../event-schemas/">
+      
+      
+        <link rel="next" href="../adr/0001-kafka-as-event-backbone/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Data Model - TeleStream</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#warehouse-data-model" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="TeleStream" class="md-header__button md-logo" aria-label="TeleStream" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            TeleStream
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Data Model
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/meekaaeelBooley/TeleStream" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    meekaaeelBooley/TeleStream
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="TeleStream" class="md-nav__button md-logo" aria-label="TeleStream" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    TeleStream
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/meekaaeelBooley/TeleStream" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    meekaaeelBooley/TeleStream
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Delivery Plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../event-schemas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Schemas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Model
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design Principles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entity-relationship-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entity Relationship Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dimensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dimensions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dimensions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dim_subscriber" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_subscriber
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dim_tower" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_tower
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dim_bundle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_bundle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dim_date" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_date
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#facts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Facts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Facts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fact_recharges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fact_recharges
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fact_bundle_sales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fact_bundle_sales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fact_calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fact_calls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fact_sms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fact_sms
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fact_data_usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fact_data_usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operational-tables-outside-the-star" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Tables (outside the star)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Operational Tables (outside the star)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dlq_records" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dlq_records
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tower_status_current" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tower_status_current
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rollup-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rollup Tables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kpi-model-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KPI → Model Mapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0001-kafka-as-event-backbone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kafka as event backbone
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0002-spark-structured-streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spark Structured Streaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0003-dual-storage-postgres-parquet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dual storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0004-docker-compose-single-machine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker Compose
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design Principles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entity-relationship-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entity Relationship Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dimensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dimensions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dimensions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dim_subscriber" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_subscriber
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dim_tower" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_tower
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dim_bundle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_bundle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dim_date" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dim_date
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#facts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Facts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Facts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fact_recharges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fact_recharges
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fact_bundle_sales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fact_bundle_sales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fact_calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fact_calls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fact_sms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fact_sms
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fact_data_usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fact_data_usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operational-tables-outside-the-star" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operational Tables (outside the star)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Operational Tables (outside the star)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dlq_records" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dlq_records
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tower_status_current" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tower_status_current
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rollup-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rollup Tables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kpi-model-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KPI → Model Mapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="warehouse-data-model">Warehouse Data Model</h1>
+<p>Star schema for the TeleStream PostgreSQL warehouse. Implemented in
+<code>warehouse/schema.sql</code>; changes go through numbered migrations.</p>
+<h2 id="design-principles">Design Principles</h2>
+<ul>
+<li><strong>Star schema:</strong> facts hold measures and foreign keys; dimensions hold descriptive
+  attributes. Grafana queries join at most one fact to its dimensions.</li>
+<li><strong>Surrogate keys</strong> (<code>*_key</code>, generated) in dimensions; facts reference surrogate keys.
+  Natural keys (<code>subscriber_id</code>, <code>tower_id</code>, <code>bundle_code</code>) kept with unique constraints.</li>
+<li><strong>Idempotent loads:</strong> every fact table has a unique constraint on <code>event_id</code>; Spark
+  upserts with <code>ON CONFLICT (event_id) DO NOTHING</code>, so replays are safe.</li>
+<li><strong>Rollups for dashboards:</strong> minute-level aggregate tables keep Grafana panels fast
+  without scanning raw facts.</li>
+</ul>
+<h2 id="entity-relationship-overview">Entity Relationship Overview</h2>
+<pre class="mermaid"><code>erDiagram
+    dim_subscriber ||--o{ fact_recharges : ""
+    dim_subscriber ||--o{ fact_bundle_sales : ""
+    dim_subscriber ||--o{ fact_calls : ""
+    dim_subscriber ||--o{ fact_sms : ""
+    dim_subscriber ||--o{ fact_data_usage : ""
+    dim_tower ||--o{ fact_calls : ""
+    dim_tower ||--o{ fact_data_usage : ""
+    dim_bundle ||--o{ fact_bundle_sales : ""
+    dim_date ||--o{ fact_recharges : ""
+    dim_date ||--o{ fact_bundle_sales : ""
+    dim_date ||--o{ fact_calls : ""
+    dim_date ||--o{ fact_sms : ""
+    dim_date ||--o{ fact_data_usage : ""</code></pre>
+<h2 id="dimensions">Dimensions</h2>
+<h3 id="dim_subscriber">dim_subscriber</h3>
+<p>Maintained from the <code>subscriber-created</code> stream.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>subscriber_key</td>
+<td>bigint PK</td>
+<td>Surrogate</td>
+</tr>
+<tr>
+<td>subscriber_id</td>
+<td>bigint UNIQUE</td>
+<td>Natural key from events</td>
+</tr>
+<tr>
+<td>msisdn</td>
+<td>varchar(11) UNIQUE</td>
+<td><code>27XXXXXXXXX</code></td>
+</tr>
+<tr>
+<td>plan</td>
+<td>varchar(16)</td>
+<td>Prepaid / Contract / TopUp</td>
+</tr>
+<tr>
+<td>province</td>
+<td>varchar(32)</td>
+<td>One of 9 SA provinces</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>timestamptz</td>
+<td>From the creation event</td>
+</tr>
+<tr>
+<td>is_active</td>
+<td>boolean</td>
+<td>Churn flag (future use)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dim_tower">dim_tower</h3>
+<p>Seeded at init from a fixture file (towers are static reference data).</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tower_key</td>
+<td>bigint PK</td>
+<td>Surrogate</td>
+</tr>
+<tr>
+<td>tower_id</td>
+<td>varchar(16) UNIQUE</td>
+<td>e.g. <code>CPT-CBD-001</code></td>
+</tr>
+<tr>
+<td>tower_name</td>
+<td>varchar(64)</td>
+<td>e.g. Cape Town CBD</td>
+</tr>
+<tr>
+<td>province</td>
+<td>varchar(32)</td>
+<td></td>
+</tr>
+<tr>
+<td>technologies</td>
+<td>varchar(16)[]</td>
+<td>Supported: 3G/LTE/5G</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dim_bundle">dim_bundle</h3>
+<p>Seeded product catalog.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bundle_key</td>
+<td>bigint PK</td>
+<td>Surrogate</td>
+</tr>
+<tr>
+<td>bundle_code</td>
+<td>varchar(32) UNIQUE</td>
+<td>e.g. <code>DATA_5GB</code></td>
+</tr>
+<tr>
+<td>bundle_name</td>
+<td>varchar(64)</td>
+<td></td>
+</tr>
+<tr>
+<td>bundle_type</td>
+<td>varchar(16)</td>
+<td>DATA / VOICE / SMS / COMBO</td>
+</tr>
+<tr>
+<td>size_mb / minutes / sms_count</td>
+<td>int nullable</td>
+<td>Whichever applies</td>
+</tr>
+<tr>
+<td>price</td>
+<td>numeric(10,2)</td>
+<td>ZAR catalog price</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dim_date">dim_date</h3>
+<p>Standard pre-generated calendar dimension (date_key <code>YYYYMMDD</code>, date, day-of-week,
+month, quarter, year, is_weekend). Facts also keep the raw <code>event_timestamp</code> for
+minute-level Grafana time series — dim_date serves daily+ analytical slicing.</p>
+<h2 id="facts">Facts</h2>
+<p>All facts share: <code>event_id uuid UNIQUE</code> (idempotency), <code>event_timestamp timestamptz</code>
+(indexed — Grafana's time axis), <code>date_key int REFERENCES dim_date</code>.</p>
+<h3 id="fact_recharges">fact_recharges</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>recharge_key</td>
+<td>bigserial PK</td>
+</tr>
+<tr>
+<td>subscriber_key</td>
+<td>bigint → dim_subscriber</td>
+</tr>
+<tr>
+<td>amount</td>
+<td>numeric(10,2)</td>
+</tr>
+<tr>
+<td>payment_method</td>
+<td>varchar(16)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fact_bundle_sales">fact_bundle_sales</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sale_key</td>
+<td>bigserial PK</td>
+</tr>
+<tr>
+<td>subscriber_key</td>
+<td>bigint → dim_subscriber</td>
+</tr>
+<tr>
+<td>bundle_key</td>
+<td>bigint → dim_bundle</td>
+</tr>
+<tr>
+<td>price</td>
+<td>numeric(10,2)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fact_calls">fact_calls</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>call_key</td>
+<td>bigserial PK</td>
+</tr>
+<tr>
+<td>caller_key</td>
+<td>bigint → dim_subscriber</td>
+</tr>
+<tr>
+<td>receiver_msisdn</td>
+<td>varchar(11)</td>
+</tr>
+<tr>
+<td>tower_key</td>
+<td>bigint → dim_tower</td>
+</tr>
+<tr>
+<td>duration_seconds</td>
+<td>int</td>
+</tr>
+<tr>
+<td>dropped</td>
+<td>boolean</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fact_sms">fact_sms</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sms_key</td>
+<td>bigserial PK</td>
+</tr>
+<tr>
+<td>sender_key</td>
+<td>bigint → dim_subscriber</td>
+</tr>
+<tr>
+<td>receiver_msisdn</td>
+<td>varchar(11)</td>
+</tr>
+<tr>
+<td>length</td>
+<td>int</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fact_data_usage">fact_data_usage</h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>usage_key</td>
+<td>bigserial PK</td>
+</tr>
+<tr>
+<td>subscriber_key</td>
+<td>bigint → dim_subscriber</td>
+</tr>
+<tr>
+<td>tower_key</td>
+<td>bigint → dim_tower</td>
+</tr>
+<tr>
+<td>mb_used</td>
+<td>numeric(12,2)</td>
+</tr>
+<tr>
+<td>session_seconds</td>
+<td>int</td>
+</tr>
+<tr>
+<td>technology</td>
+<td>varchar(8)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="operational-tables-outside-the-star">Operational Tables (outside the star)</h2>
+<h3 id="dlq_records">dlq_records</h3>
+<p>Queryable dead letter queue for the review dashboard.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dlq_key</td>
+<td>bigserial PK</td>
+</tr>
+<tr>
+<td>event_id</td>
+<td>uuid</td>
+</tr>
+<tr>
+<td>source_topic</td>
+<td>varchar(64)</td>
+</tr>
+<tr>
+<td>rejection_reason</td>
+<td>varchar(128)</td>
+</tr>
+<tr>
+<td>original_payload</td>
+<td>jsonb</td>
+</tr>
+<tr>
+<td>rejected_at</td>
+<td>timestamptz</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tower_status_current">tower_status_current</h3>
+<p>Latest-state table (upsert on <code>tower_id</code>) powering the Network dashboard's live tower
+health panels: signal_strength, connected_devices, status, updated_at.</p>
+<h2 id="rollup-tables">Rollup Tables</h2>
+<p>Maintained incrementally by Spark's <code>foreachBatch</code>; primary key <code>(minute, ...group)</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Grain</th>
+<th>Measures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>agg_revenue_minute</td>
+<td>minute × province × revenue_type</td>
+<td>total_amount, txn_count</td>
+</tr>
+<tr>
+<td>agg_calls_minute</td>
+<td>minute × tower_key</td>
+<td>call_count, dropped_count, total_duration</td>
+</tr>
+<tr>
+<td>agg_data_minute</td>
+<td>minute × tower_key × technology</td>
+<td>total_mb, session_count</td>
+</tr>
+<tr>
+<td>agg_dlq_minute</td>
+<td>minute × source_topic × reason</td>
+<td>record_count</td>
+</tr>
+</tbody>
+</table>
+<h2 id="kpi-model-mapping">KPI → Model Mapping</h2>
+<table>
+<thead>
+<tr>
+<th>KPI</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Subscribers online / new subscribers</td>
+<td>dim_subscriber (created_at)</td>
+</tr>
+<tr>
+<td>Transactions per second</td>
+<td>agg_revenue_minute, agg_calls_minute</td>
+</tr>
+<tr>
+<td>Calls per minute / dropped calls</td>
+<td>agg_calls_minute</td>
+</tr>
+<tr>
+<td>Data usage per minute</td>
+<td>agg_data_minute</td>
+</tr>
+<tr>
+<td>Average recharge / recharge revenue</td>
+<td>fact_recharges, agg_revenue_minute</td>
+</tr>
+<tr>
+<td>Bundle sales / top products</td>
+<td>fact_bundle_sales + dim_bundle</td>
+</tr>
+<tr>
+<td>Revenue by province</td>
+<td>agg_revenue_minute</td>
+</tr>
+<tr>
+<td>ARPU</td>
+<td>revenue facts ÷ active dim_subscriber count</td>
+</tr>
+<tr>
+<td>Network errors / failed payments</td>
+<td>agg_dlq_minute, dlq_records</td>
+</tr>
+<tr>
+<td>Tower load / signal strength</td>
+<td>tower_status_current, agg_data_minute</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
