@@ -19,9 +19,9 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] Fresh clone → `pip install -e ".[dev]"` → `pytest` passes.
-- [ ] CI is green on `main`.
-- [ ] `mkdocs build --strict` succeeds.
+- [x] Fresh clone → `pip install -e ".[dev]"` → `pytest` passes.
+- [x] CI is green on `main`.
+- [x] `mkdocs build --strict` succeeds.
 
 ## Phase 1 — Event Generation & Kafka
 
@@ -35,10 +35,10 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] `docker compose up -d` starts Kafka + producer; events visible via console consumer
+- [x] `docker compose up -d` starts Kafka + producer; events visible via console consumer
       on every topic.
-- [ ] Generators are unit-tested (valid events pass contracts; injected errors fail them).
-- [ ] Throughput and error rate configurable via env vars.
+- [x] Generators are unit-tested (valid events pass contracts; injected errors fail them).
+- [x] Throughput and error rate configurable via env vars.
 
 ## Phase 2 — Spark Structured Streaming Core
 
@@ -52,10 +52,10 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] Valid events land in Parquet; malformed/rule-violating events land in the DLQ —
+- [x] Valid events land in Parquet; malformed/rule-violating events land in the DLQ —
       demonstrated by an integration test.
-- [ ] Restarting the Spark container neither loses nor duplicates events (checkpoint test).
-- [ ] Business rules covered by unit tests without Spark.
+- [x] Restarting the Spark container neither loses nor duplicates events (checkpoint test).
+- [x] Business rules covered by unit tests without Spark.
 
 ## Phase 3 — Warehouse
 
@@ -70,9 +70,9 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] End-to-end integration test: produce N known events → assert exact warehouse rows.
-- [ ] Replaying the same events does not create duplicates (idempotency test).
-- [ ] Fact rows join cleanly to all dimensions (no orphan keys).
+- [x] End-to-end integration test: produce N known events → assert exact warehouse rows.
+- [x] Replaying the same events does not create duplicates (idempotency test).
+- [x] Fact rows join cleanly to all dimensions (no orphan keys).
 
 ## Phase 4 — Dashboards
 
@@ -85,9 +85,9 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] Fresh `docker compose up -d` → Grafana shows live-updating panels within ~2 minutes,
+- [x] Fresh `docker compose up -d` → Grafana shows live-updating panels within ~2 minutes,
       no manual setup.
-- [ ] Every KPI panel is backed by a documented query against the star schema/rollups.
+- [x] Every KPI panel is backed by a documented query against the star schema/rollups.
 - [ ] Screenshots captured for the README.
 
 ## Phase 5 — Observability
@@ -102,7 +102,7 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] Kafka consumer lag per topic visible in Grafana.
+- [x] Kafka consumer lag per topic visible in Grafana.
 - [ ] Killing the Spark job triggers visible lag growth and the stalled-pipeline alert.
 
 ## Phase 6 — Data Quality & Hardening

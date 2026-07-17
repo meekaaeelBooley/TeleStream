@@ -1,5 +1,9 @@
 # TeleStream
 
+[![CI](https://github.com/meekaaeelBooley/TeleStream/actions/workflows/ci.yml/badge.svg)](https://github.com/meekaaeelBooley/TeleStream/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![Python 3.12](https://img.shields.io/badge/python-3.12-blue)
+
 > An enterprise-inspired streaming data platform that simulates a telecom operator's
 > real-time subscriber events — ingested through **Apache Kafka**, processed with
 > **Spark Structured Streaming**, quality-checked with **Pandera** and
@@ -7,11 +11,12 @@
 > **Parquet** data lake, and visualized through **Grafana** with **Prometheus**
 > observability. The whole stack runs with one `docker compose up`.
 
-**Status: core platform working end-to-end.** Event generation → Kafka → Spark
-validation/rules/dedup → Postgres star schema + Parquet lake → five provisioned Grafana
-dashboards, with Prometheus scraping Kafka lag and warehouse health. Verified by 55 unit
-tests and 12 integration tests against the live stack. Remaining roadmap (Great
-Expectations suites, hardening, polish): [delivery plan](docs/planning.md).
+**Status: v1 complete.** Event generation → Kafka → Spark validation/rules/dedup →
+Postgres star schema + Parquet lake → five provisioned Grafana dashboards, with
+Prometheus scraping Kafka lag and warehouse health. Verified by 55 unit tests and 18
+integration tests against the live stack — including Great Expectations warehouse
+suites and failure-mode tests (broker restart, Spark restart, warehouse outage).
+What's next: [stretch goals](docs/planning.md).
 
 ## Why This Project
 
@@ -107,6 +112,42 @@ pytest tests/unit                    # fast, no services needed
 pytest tests/integration             # requires the compose stack to be up
 ruff check . && mypy                 # lint + strict typing
 ```
+
+## Dashboards
+
+Five Grafana dashboards are provisioned automatically (JSON generated from
+[dashboards/generate_dashboards.py](dashboards/generate_dashboards.py) — dashboards are code here):
+
+| Dashboard | Audience | Highlights |
+|---|---|---|
+| Executive Overview | Leadership | Subscribers, revenue/min, calls/min, rejected events |
+| Network Operations | NOC | Live tower status, tower load, dropped calls, traffic by technology |
+| Sales & Revenue | Commercial | Airtime vs bundle revenue, top products, revenue by province, failed payments |
+| Customer Insights | CVM | Subscribers by province/plan, ARPU, top data users |
+| Pipeline Operations | Data platform | DLQ breakdown by reason, latest dead letters, Kafka consumer lag |
+
+## Data Quality — Two Layers
+
+- **In-stream (per event):** pandera contracts + a pure-Python business rules engine inside
+  the Spark job. Violations are never dropped — they go to the `failed-transactions` DLQ
+  with machine-readable reasons (`PARSE_ERROR`, `SCHEMA_VIOLATION:<field>`,
+  `RULE_VIOLATION:<rule>`, `REFERENTIAL:<check>`, `PAYMENT_DECLINED`).
+- **At-rest (warehouse):** Great Expectations suites ([quality/](quality/)) assert on what
+  actually landed — uniqueness of event ids, value ranges, referential integrity, timestamp
+  sanity. The integration tests prove the suites pass on real pipeline output *and* catch a
+  deliberately planted bad row.
+
+## Testing & CI
+
+- **55 unit tests** — generators, contracts, business rules, schema-drift guards
+  (producer contracts vs Spark schemas vs generated artifacts). No Docker needed.
+- **Integration tests** — against the real compose stack: produce → Kafka → Spark →
+  Postgres assertions, DLQ contents, rollups, no orphans/duplicates, Great Expectations
+  suites, and failure-mode tests (broker restart, Spark restart, warehouse outage —
+  verifying checkpoint recovery and idempotent sinks).
+- **GitHub Actions** — lint (ruff) → types (mypy --strict) → unit tests → docs build,
+  then a second job that builds the full Docker stack on the runner and runs the
+  integration suite against it.
 
 ## Roadmap
 
